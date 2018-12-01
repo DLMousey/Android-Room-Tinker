@@ -8,22 +8,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.enderstudy.roomtinker.Entity.Word;
+import com.enderstudy.roomtinker.Interface.OnItemClickListener;
 import com.enderstudy.roomtinker.R;
 
 import java.util.List;
 
-public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordViewHolder> {
+public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordViewHolder> implements OnItemClickListener {
 
-    class WordViewHolder extends RecyclerView.ViewHolder {
-        private final TextView wordItemView;
-
-        private WordViewHolder(View itemView) {
-            super(itemView);
-            wordItemView = itemView.findViewById(R.id.textView);
-        }
+    @Override
+    public void onClick(View view, int position) {
+        this.onClick(view, position);
     }
 
     private final LayoutInflater mInflater;
+    private OnItemClickListener mClickListener;
     private List<Word> mWords;
 
     public WordListAdapter(Context context) { mInflater = LayoutInflater.from(context); }
@@ -31,7 +29,8 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
     @Override
     public WordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = mInflater.inflate(R.layout.recyclerview_item, parent, false);
-        return new WordViewHolder(itemView);
+        RecyclerView.ViewHolder holder = new WordViewHolder(itemView);
+        return (WordViewHolder) holder;
     }
 
     @Override
@@ -44,6 +43,10 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
         }
     }
 
+    public void setClickListener(OnItemClickListener callback) {
+        mClickListener = callback;
+    }
+
     public void setWords(List<Word> words) {
         mWords = words;
         notifyDataSetChanged();
@@ -54,5 +57,27 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
         if (mWords != null)
             return mWords.size();
         else return 0;
+    }
+
+    public Word getWordAtPosition(int position) {
+        return mWords.get(position);
+    }
+
+    /**
+     * Word View Holder Inner Class
+     */
+    public class WordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final TextView wordItemView;
+
+        public WordViewHolder(View itemView) {
+            super(itemView);
+            wordItemView = itemView.findViewById(R.id.textView);
+            wordItemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition());
+        }
     }
 }

@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 import com.enderstudy.roomtinker.Dao.WordDao;
 import com.enderstudy.roomtinker.Entity.Word;
 
-@Database(entities = {Word.class}, version = 1)
+@Database(entities = {Word.class}, version = 2)
 public abstract class WordRoomDatabase extends RoomDatabase {
     public abstract WordDao wordDao();
 
@@ -28,6 +28,7 @@ public abstract class WordRoomDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             WordRoomDatabase.class, "word_database")
                             .addCallback(sRoomDatabaseCallback)
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
@@ -57,10 +58,15 @@ public abstract class WordRoomDatabase extends RoomDatabase {
         @Override
         protected Void doInBackground(final Void... params) {
             mDao.deleteAll();
-            Word word = new Word("Hello");
+            Word word = new Word();
+            word.setWord("Hello");
+            word.setDescription("A greeting");
+
             mDao.insert(word);
 
-            word = new Word("World");
+            word = new Word();
+            word.setWord("Dog");
+            word.setDescription("A good boy.");
             mDao.insert(word);
 
             return null;

@@ -1,5 +1,6 @@
 package com.enderstudy.roomtinker;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -11,20 +12,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.enderstudy.roomtinker.Adapter.WordListAdapter;
+import com.enderstudy.roomtinker.Dao.WordDao;
 import com.enderstudy.roomtinker.Entity.Word;
+import com.enderstudy.roomtinker.Interface.OnItemClickListener;
 import com.enderstudy.roomtinker.ViewModel.WordViewModel;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnItemClickListener {
 
     private WordViewModel mWordViewModel;
+    private WordListAdapter mWordAdapter;
     public static final int NEW_WORD_ACTIVITY_REQUEST_CODE = 1;
 
     @Override
@@ -36,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         final WordListAdapter adapter = new WordListAdapter(this);
+
+        adapter.setClickListener(this);
+        mWordAdapter = adapter;
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -62,7 +72,10 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == NEW_WORD_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            Word word = new Word(data.getStringExtra(NewWordActivity.getExtraReply()));
+            Word word = new Word();
+            word.setWord(data.getStringExtra(NewWordActivity.getExtraTitle()));
+            word.setDescription(data.getStringExtra(NewWordActivity.getExtraDescription()));
+
             mWordViewModel.insert(word);
         } else {
             Toast.makeText(
@@ -92,5 +105,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view, int position) {
+        Word clickedWord = mWordAdapter.getWordAtPosition(position);
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("word_data", clickedWord);
+
+        Log.d("com.enderstudy.roomtinker.handlers", "on click fired in main activity");
+        Log.d("com.enderstudy.roomtinker.handlers", clickedWord.getWord());
+
+        startActivity(intent);
     }
 }
