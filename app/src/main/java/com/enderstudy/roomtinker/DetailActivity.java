@@ -1,5 +1,6 @@
 package com.enderstudy.roomtinker;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -18,6 +19,8 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mWordTitle = (TextView) findViewById(R.id.word_field);
         mWordDescription = (TextView) findViewById(R.id.word_description);

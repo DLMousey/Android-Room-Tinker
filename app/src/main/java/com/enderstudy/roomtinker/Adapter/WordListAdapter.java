@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.enderstudy.roomtinker.Entity.Word;
 import com.enderstudy.roomtinker.Interface.OnItemClickListener;
+import com.enderstudy.roomtinker.Interface.OnItemLongClickListener;
 import com.enderstudy.roomtinker.R;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
 
     private final LayoutInflater mInflater;
     private OnItemClickListener mClickListener;
+    private OnItemLongClickListener mLongClickListener;
     private List<Word> mWords;
 
     public WordListAdapter(Context context) { mInflater = LayoutInflater.from(context); }
@@ -35,6 +37,8 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
 
     @Override
     public void onBindViewHolder(WordViewHolder holder, int position) {
+        holder.wordItemView.setLongClickable(true);
+
         if (mWords != null) {
             Word current = mWords.get(position);
             holder.wordItemView.setText(current.getWord());
@@ -46,6 +50,8 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
     public void setClickListener(OnItemClickListener callback) {
         mClickListener = callback;
     }
+
+    public void setLongClickListener(OnItemLongClickListener callback) { mLongClickListener = callback; }
 
     public void setWords(List<Word> words) {
         mWords = words;
@@ -66,18 +72,25 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
     /**
      * Word View Holder Inner Class
      */
-    public class WordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class WordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private final TextView wordItemView;
 
         public WordViewHolder(View itemView) {
             super(itemView);
             wordItemView = itemView.findViewById(R.id.textView);
             wordItemView.setOnClickListener(this);
+            wordItemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (mLongClickListener != null) mLongClickListener.onLongClick(view, getAdapterPosition());
+            return false;
         }
     }
 }

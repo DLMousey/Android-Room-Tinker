@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,20 +15,24 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.enderstudy.roomtinker.Adapter.WordListAdapter;
 import com.enderstudy.roomtinker.Dao.WordDao;
 import com.enderstudy.roomtinker.Entity.Word;
 import com.enderstudy.roomtinker.Interface.OnItemClickListener;
+import com.enderstudy.roomtinker.Interface.OnItemLongClickListener;
 import com.enderstudy.roomtinker.ViewModel.WordViewModel;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements OnItemClickListener, OnItemLongClickListener {
 
     private WordViewModel mWordViewModel;
     private WordListAdapter mWordAdapter;
@@ -44,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         final WordListAdapter adapter = new WordListAdapter(this);
 
         adapter.setClickListener(this);
+        adapter.setLongClickListener(this);
         mWordAdapter = adapter;
 
         recyclerView.setAdapter(adapter);
@@ -65,6 +71,29 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
                 startActivityForResult(intent, NEW_WORD_ACTIVITY_REQUEST_CODE);
             }
         });
+
+        ItemTouchHelper helper = new ItemTouchHelper(
+            new ItemTouchHelper.SimpleCallback(0,
+                    ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                @Override
+                public boolean onMove(RecyclerView recyclerView,
+                                      RecyclerView.ViewHolder viewHolder,
+                                      RecyclerView.ViewHolder target) {
+                    return false;
+                }
+
+                @Override
+                public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                    int position = viewHolder.getAdapterPosition();
+                    Word swipedWord = adapter.getWordAtPosition(position);
+                    Toast.makeText(MainActivity.this, "Deleting " + swipedWord.getWord(), Toast.LENGTH_LONG).show();
+
+                    mWordViewModel.delete(swipedWord);
+                }
+            }
+        );
+
+        helper.attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -117,5 +146,10 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         Log.d("com.enderstudy.roomtinker.handlers", clickedWord.getWord());
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onLongClick(View view, int position) {
+        Log.d("com.enderstudy.roomtinker.handlers", "on long click fired in main activity");
     }
 }

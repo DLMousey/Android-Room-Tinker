@@ -27,7 +27,7 @@ public abstract class WordRoomDatabase extends RoomDatabase {
                     // If there's no singleton instance created yet, Construct one
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             WordRoomDatabase.class, "word_database")
-                            .addCallback(sRoomDatabaseCallback)
+//                            .addCallback(sRoomDatabaseCallback) // Remove the DB population callback
                             .fallbackToDestructiveMigration()
                             .build();
                 }

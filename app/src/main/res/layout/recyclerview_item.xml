@@ -6,10 +6,11 @@
 
     <TextView
         android:id="@+id/textView"
-        android:drawableBottom="@color/colorPrimary"
-        android:background="#FFFFFF"
-        android:textSize="24sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true" />
+        android:background="#FFFFFF"
+        android:clickable="true"
+        android:drawableBottom="@color/colorPrimary"
+        android:paddingVertical="8dp"
+        android:textSize="18sp" />
 </LinearLayout>
